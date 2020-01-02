@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="X-UA-Compatible" content="ie=edge">
+  <title>空氣品質指標</title>
+  <script src="plugins/jquery-3.4.1.min.js"></script>
+
+  <!-- bootstrap style -->
+  <link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/v/bs4-4.1.1/dt-1.10.20/datatables.min.css" />
+  <script type="text/javascript" src="https://cdn.datatables.net/v/bs4-4.1.1/dt-1.10.20/datatables.min.js"></script>
+  <style>
+    body{
+      font-family: '微軟正黑體';
+    }
+    tr:hover{
+      background: #dee2e655;
+    }
+  </style>
+</head>
+<body>
+  <!-- https://opendata.epa.gov.tw/Data/Contents/AQI/ -->
+  <div style="width: 95vw; margin: auto;">
+    <h1 align="center" style="margin: 0.5em 0 0.5em 0;">空氣品質指標(AQI)</span></h1>
+    <h6 align="center">更新時間： <span id="date"></span> (每小時更新)</h6>
+    <table id="dt" cellpadding="10" class="table" style="text-align:center">
+      <thead>
+        <tr class="table-active">
+          <th>測站名稱</th>
+          <th>縣市</th>
+          <th>空氣品質指標</th>
+          <th>狀態</th>
+          <th>二氧化硫(ppb)</th>
+          <th>一氧化碳(ppm)</th>
+          <th>臭氧(ppb)</th>
+          <th>懸浮微粒(μg/m<sup>3</sup>)</th>
+          <th>細懸浮微粒(μg/m<sup>3</sup>)</th>
+          <th>氮氧化物(ppb)</th>
+          <th>風速(m/sec)</th>
+          <th>風向(degrees)</th>
+        </tr>
+      </thead>
+      <tbody></tbody>
+    </table>
+  </div>
+
+<script>
+  var data;
+  $.getJSON("myapi.php")
+    .done(function(e) {
+      let print="";
+      // console.log((data = e));
+      data=e.result.records;
+      for(let i=0;i<data.length;i++){
+        print+=`
+        <tr>
+          <td>${data[i].SiteName}</td>
+          <td>${data[i].County}</td>
+          <td>${data[i].AQI}</td>
+          <td>${data[i].Status}</td>
+          <td>${data[i].SO2}</td>
+          <td>${data[i].CO}</td>
+          <td>${data[i].O3}</td>
+          <td>${data[i].PM10}</td>
+          <td>${data[i]["PM2.5"]}</td>
+          <td>${data[i].NOx}</td>
+          <td>${data[i].WindSpeed}</td>
+          <td>${data[i].WindDirec}</td>
+        </tr>
+        `;
+      }
+      $("tbody").html(print);
+      $("#date").html(data[0].PublishTime);
+      $('#dt').DataTable();
+    })
+    .fail(function() {
+        alert("this open-api got fail");
+    });
+</script>
+
+</body>
+</html>
